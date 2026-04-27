@@ -290,44 +290,90 @@ const History = () => {
             <div className="divide-y divide-border/50">
               {history.map((item) => {
                 const cat = item.riskCategory || categoryFromScore(item.threatScore);
+                const displayUrl = item.url || item.fileName || "";
+                const shortUrl = displayUrl.length > 40 
+                  ? displayUrl.substring(0, 37) + "..." 
+                  : displayUrl;
+                
                 return (
                   <div
                     key={item.id}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-muted/20 transition-colors group"
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-muted/20 transition-colors group"
                   >
-                    <div 
-                      className="text-2xl font-bold tabular-nums w-14 text-center cursor-pointer" 
-                      style={{ color: `hsl(var(--risk-${cat.toLowerCase()}))` }}
-                      onClick={() => handleViewDetails(item)}
-                    >
-                      {Math.round(item.threatScore)}
+                    {/* Mobile: Score and Badge in one row */}
+                    <div className="flex items-center gap-3 sm:contents">
+                      <div 
+                        className="text-2xl sm:text-2xl font-bold tabular-nums w-12 sm:w-14 text-center cursor-pointer shrink-0" 
+                        style={{ color: `hsl(var(--risk-${cat.toLowerCase()}))` }}
+                        onClick={() => handleViewDetails(item)}
+                      >
+                        {Math.round(item.threatScore)}
+                      </div>
+                      <div className="sm:hidden">
+                        <RiskBadge category={cat} size="sm" />
+                      </div>
                     </div>
+                    
+                    {/* URL/Filename and Date */}
                     <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleViewDetails(item)}>
-                      <p className="font-mono text-sm truncate">{item.url || item.fileName}</p>
+                      <p className="font-mono text-xs sm:text-sm break-all sm:truncate" title={displayUrl}>
+                        {shortUrl}
+                      </p>
                       {item.scannedAt && (
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {new Date(item.scannedAt).toLocaleString()}
+                          {new Date(item.scannedAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </p>
                       )}
                     </div>
-                    <RiskBadge category={cat} size="sm" />
-                    <button
-                      onClick={(e) => handleDownloadPDF(item, e)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-primary/10 rounded-lg"
-                      title="Download PDF"
-                    >
-                      <FileDown className="w-4 h-4 text-primary" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(item.id);
-                      }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/10 rounded-lg"
-                      title="Delete scan"
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </button>
+                    
+                    {/* Desktop: Badge and Actions */}
+                    <div className="hidden sm:flex items-center gap-2">
+                      <RiskBadge category={cat} size="sm" />
+                      <button
+                        onClick={(e) => handleDownloadPDF(item, e)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-primary/10 rounded-lg"
+                        title="Download PDF"
+                      >
+                        <FileDown className="w-4 h-4 text-primary" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/10 rounded-lg"
+                        title="Delete scan"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </button>
+                    </div>
+                    
+                    {/* Mobile: Action Buttons */}
+                    <div className="flex sm:hidden items-center gap-2 justify-end">
+                      <button
+                        onClick={(e) => handleDownloadPDF(item, e)}
+                        className="p-2 hover:bg-primary/10 rounded-lg transition-colors"
+                        title="Download PDF"
+                      >
+                        <FileDown className="w-4 h-4 text-primary" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                        className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                        title="Delete scan"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </button>
+                    </div>
                   </div>
                 );
               })}

@@ -52,17 +52,17 @@ const StatCard = ({
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="glass rounded-2xl p-6"
+    className="glass rounded-2xl p-4 sm:p-6"
   >
-    <div className="flex items-center justify-between mb-3">
+    <div className="flex items-center justify-between mb-2 sm:mb-3">
       <span className="text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
-      <div className={`w-9 h-9 rounded-lg bg-${color}/10 flex items-center justify-center`}>
+      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-${color}/10 flex items-center justify-center`}>
         <Icon className={`w-4 h-4 text-${color}`} />
       </div>
     </div>
-    <div className="text-3xl md:text-4xl font-bold tabular-nums">
+    <div className="text-2xl sm:text-3xl md:text-4xl font-bold tabular-nums">
       <CountUp value={value} />
-      {suffix && <span className="text-lg text-muted-foreground ml-1">{suffix}</span>}
+      {suffix && <span className="text-sm sm:text-lg text-muted-foreground ml-1">{suffix}</span>}
     </div>
   </motion.div>
 );
@@ -82,15 +82,15 @@ const Dashboard = () => {
   return (
     <PageLayout>
       <section className="container py-12 md:py-16">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Global Statistics</h1>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Global Statistics</h1>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium w-fit">
               <Globe className="w-3.5 h-3.5" />
               All Users
             </div>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Real-time overview of all threat detection activity across the platform.
           </p>
         </div>
@@ -123,16 +123,16 @@ const Dashboard = () => {
               />
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-5 mt-6">
+            <div className="grid lg:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-6">
               {/* Distribution */}
-              <div className="glass rounded-2xl p-6">
-                <h3 className="font-semibold mb-1">Threat distribution</h3>
+              <div className="glass rounded-2xl p-4 sm:p-6">
+                <h3 className="font-semibold mb-1 text-sm sm:text-base">Threat distribution</h3>
                 <p className="text-xs text-muted-foreground mb-4">
                   Breakdown of all scans by risk category.
                 </p>
-                <div className="h-64">
+                <div className="h-48 sm:h-64">
                   {distribution.length === 0 || distribution.every(d => d.count === 0) ? (
-                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                    <div className="h-full flex items-center justify-center text-xs sm:text-sm text-muted-foreground px-4 text-center">
                       No scans yet. Be the first to analyze a URL!
                     </div>
                   ) : (
@@ -142,8 +142,8 @@ const Dashboard = () => {
                           data={distribution.filter(d => d.count > 0)}
                           dataKey="count"
                           nameKey="category"
-                          innerRadius={60}
-                          outerRadius={95}
+                          innerRadius={window.innerWidth < 640 ? 40 : 60}
+                          outerRadius={window.innerWidth < 640 ? 70 : 95}
                           paddingAngle={3}
                           stroke="none"
                         >
@@ -159,13 +159,14 @@ const Dashboard = () => {
                             background: "hsl(var(--popover))",
                             border: "1px solid hsl(var(--border))",
                             borderRadius: 12,
+                            fontSize: '12px'
                           }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-3 justify-center mt-2">
+                <div className="flex flex-wrap gap-2 sm:gap-3 justify-center mt-2">
                   {distribution.filter(d => d.count > 0).map((d) => (
                     <div key={d.category} className="flex items-center gap-1.5 text-xs">
                       <span
@@ -180,36 +181,36 @@ const Dashboard = () => {
               </div>
 
               {/* Info Card */}
-              <div className="glass rounded-2xl p-6">
-                <h3 className="font-semibold mb-1">Platform insights</h3>
+              <div className="glass rounded-2xl p-4 sm:p-6">
+                <h3 className="font-semibold mb-1 text-sm sm:text-base">Platform insights</h3>
                 <p className="text-xs text-muted-foreground mb-4">
                   Aggregated data from all users worldwide.
                 </p>
-                <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Detection accuracy</span>
-                      <span className="text-2xl font-bold text-primary">96%</span>
+                      <span className="text-xs sm:text-sm font-medium">Detection accuracy</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">96%</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       ML model accuracy on threat detection
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Threat sources</span>
-                      <span className="text-2xl font-bold text-primary">5+</span>
+                      <span className="text-xs sm:text-sm font-medium">Threat sources</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">5+</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       VirusTotal, Google Safe Browsing, PhishTank, ML, Heuristics
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Features analyzed</span>
-                      <span className="text-2xl font-bold text-primary">27</span>
+                      <span className="text-xs sm:text-sm font-medium">Features analyzed</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">27</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       URL patterns, WHOIS data, redirects, and more
@@ -217,10 +218,10 @@ const Dashboard = () => {
                   </div>
 
                   {data && data.totalScans > 0 && (
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
+                    <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Threats blocked</span>
-                        <span className="text-2xl font-bold text-primary">
+                        <span className="text-xs sm:text-sm font-medium">Threats blocked</span>
+                        <span className="text-xl sm:text-2xl font-bold text-primary">
                           {((data.threatDistribution?.HIGH || 0) + (data.threatDistribution?.CRITICAL || 0)).toLocaleString()}
                         </span>
                       </div>
@@ -234,14 +235,14 @@ const Dashboard = () => {
             </div>
 
             {/* Additional Info */}
-            <div className="glass rounded-2xl p-6 mt-6">
+            <div className="glass rounded-2xl p-4 sm:p-6 mt-4 sm:mt-6">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Globe className="w-5 h-5 text-primary" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Globe className="w-4 sm:w-5 h-4 sm:h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">About Global Statistics</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <h3 className="font-semibold mb-1 text-sm sm:text-base">About Global Statistics</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                     These statistics represent aggregated data from all users of Catchers AI worldwide. 
                     The data helps us understand threat patterns and improve our detection algorithms. 
                     Your individual scan history remains private and is stored only on your device.
