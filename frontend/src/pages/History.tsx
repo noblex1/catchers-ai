@@ -1,7 +1,7 @@
 import { PageLayout } from "@/components/PageLayout";
 import { useState, useEffect } from "react";
 import { RiskBadge } from "@/components/RiskBadge";
-import { Search, ChevronLeft, ChevronRight, Inbox, Trash2, Download, Upload as UploadIcon } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Inbox, Trash2, Download, Upload as UploadIcon, FileDown } from "lucide-react";
 import { categoryFromScore } from "@/lib/risk";
 import { 
   getFilteredHistory, 
@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
+import { generateScanPDF } from "@/lib/pdfGenerator";
 
 const PAGE = 50;
 const filters: (RiskCategory | "ALL")[] = ["ALL", "LOW", "MEDIUM", "HIGH", "CRITICAL"];
@@ -156,6 +157,24 @@ const History = () => {
       toast({
         title: "File scan",
         description: "File scans cannot be re-analyzed. Upload the file again to scan.",
+      });
+    }
+  };
+
+  const handleDownloadPDF = (scan: LocalScanHistory, event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      generateScanPDF(scan);
+      toast({
+        title: "PDF Downloaded",
+        description: "Your scan report has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "Download Failed",
+        description: "Could not generate PDF report. Please try again.",
+        variant: "destructive",
       });
     }
   };
@@ -292,6 +311,13 @@ const History = () => {
                       )}
                     </div>
                     <RiskBadge category={cat} size="sm" />
+                    <button
+                      onClick={(e) => handleDownloadPDF(item, e)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-primary/10 rounded-lg"
+                      title="Download PDF"
+                    >
+                      <FileDown className="w-4 h-4 text-primary" />
+                    </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

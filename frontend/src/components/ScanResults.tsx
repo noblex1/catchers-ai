@@ -12,9 +12,12 @@ import {
   Clock,
   ShieldCheck,
   ShieldAlert,
+  Download,
 } from "lucide-react";
 import { useState } from "react";
 import { categoryFromScore } from "@/lib/risk";
+import { generateScanPDF } from "@/lib/pdfGenerator";
+import { toast } from "@/hooks/use-toast";
 
 const ResultIcon = ({ result }: { result: string }) => {
   const r = result?.toUpperCase();
@@ -77,6 +80,23 @@ export const ScanResults = ({ result, onReset }: Props) => {
   const technical = result.technicalDetails || {};
   const explainability = result.explainability?.featureContributions || [];
 
+  const handleDownloadPDF = () => {
+    try {
+      generateScanPDF(result);
+      toast({
+        title: "PDF Downloaded",
+        description: "Your scan report has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "Download Failed",
+        description: "Could not generate PDF report. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -99,6 +119,14 @@ export const ScanResults = ({ result, onReset }: Props) => {
                   Analyzed in {result.processingTime}
                 </span>
               )}
+              <button
+                onClick={handleDownloadPDF}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                title="Download PDF Report"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download PDF
+              </button>
             </div>
             <div className="space-y-1.5">
               <p className="text-xs uppercase tracking-widest text-muted-foreground">
