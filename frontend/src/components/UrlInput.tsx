@@ -41,14 +41,14 @@ export const UrlInput = ({ onSubmit, loading, defaultValue = "", size = "lg" }: 
           isLg ? "p-1.5" : "p-1"
         } focus-within:ring-2 focus-within:ring-primary/50 focus-within:glow-primary`}
       >
-        <Search className={`text-muted-foreground ml-3 ${isLg ? "w-5 h-5" : "w-4 h-4"}`} />
+        <Search className={`text-muted-foreground ml-3 shrink-0 ${isLg ? "w-5 h-5" : "w-4 h-4"}`} />
         <input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="https://example.com"
           maxLength={2048}
-          className={`flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/70 px-3 ${
+          className={`flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/70 px-3 min-w-0 ${
             isLg ? "py-4 text-base" : "py-2.5 text-sm"
           }`}
           disabled={loading}
@@ -58,14 +58,19 @@ export const UrlInput = ({ onSubmit, loading, defaultValue = "", size = "lg" }: 
           variant="hero"
           size={isLg ? "lg" : "default"}
           disabled={loading}
-          className="rounded-xl"
+          className="rounded-xl shrink-0 whitespace-nowrap"
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Scanning…
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              <span className="hidden sm:inline">Scanning…</span>
+              <span className="sm:hidden">Scan</span>
             </>
           ) : (
-            <>Analyze</>
+            <>
+              <span className="hidden sm:inline">Analyze</span>
+              <span className="sm:hidden">Scan</span>
+            </>
           )}
         </Button>
       </div>
