@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Catchers AI Design System
+   All colors HSL. Dark-first cyber security aesthetic.
+*/
+
+@layer base {
+  :root {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 40% 9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+    --primary-glow: 250 90% 70%;
+
+    --secondary: 262 83% 65%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222 30% 14%;
+    --muted-foreground: 215 20% 70%;
+
+    --accent: 250 80% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Risk colors */
+    --risk-low: 158 64% 45%;
+    --risk-medium: 43 96% 56%;
+    --risk-high: 25 95% 53%;
+    --risk-critical: 0 84% 55%;
+
+    --border: 222 30% 18%;
+    --input: 222 30% 16%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.875rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(262 83% 65%));
+    --gradient-hero: radial-gradient(ellipse at top, hsl(250 80% 30% / 0.4), transparent 60%),
+                     radial-gradient(ellipse at bottom right, hsl(217 91% 40% / 0.3), transparent 50%),
+                     hsl(222 47% 6%);
+    --gradient-card: linear-gradient(135deg, hsl(222 40% 11% / 0.9), hsl(222 40% 8% / 0.7));
+    --gradient-glow: radial-gradient(circle, hsl(217 91% 60% / 0.3), transparent 70%);
+
+    /* Shadows */
+    --shadow-glow: 0 0 60px hsl(217 91% 60% / 0.3);
+    --shadow-glow-purple: 0 0 60px hsl(262 83% 65% / 0.35);
+    --shadow-elegant: 0 20px 60px -10px hsl(222 47% 2% / 0.6);
+
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .light {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --muted: 210 40% 94%;
+    --muted-foreground: 215 16% 40%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background: var(--gradient-hero);
+    background-attachment: fixed;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-xl border border-white/5;
+    background: var(--gradient-card);
+  }
+
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-purple {
+    box-shadow: var(--shadow-glow-purple);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .grid-pattern {
+    background-image:
+      linear-gradient(hsl(217 91% 60% / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(217 91% 60% / 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+}

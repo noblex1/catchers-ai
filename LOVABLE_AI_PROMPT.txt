@@ -1,0 +1,205 @@
+Build me a professional frontend for Catchers AI - an advanced threat detection and phishing analysis platform.
+
+🎯 PROJECT OVERVIEW:
+I have a fully functional backend API (Node.js + ML service) that analyzes URLs and files for security threats using multiple threat intelligence sources (VirusTotal, Google Safe Browsing, PhishTank) and a Machine Learning model (96% accuracy). I need you to build ONLY the frontend that connects to this existing API.
+
+🔗 BACKEND API DETAILS:
+
+Base URL: http://localhost:3000 (development)
+
+Main Endpoint - Analyze URL:
+POST /api/v1/threats/analyze-url
+Body: { "url": "https://example.com" }
+
+Response includes:
+- threatScore (0-100)
+- riskCategory (LOW, MEDIUM, HIGH, CRITICAL)
+- recommendation (text advice)
+- aiAnalysis (detailed AI explanation)
+- riskFactors (array of detected issues)
+- securityFeatures (array of positive features)
+- detectionMethods (results from VirusTotal, Google Safe Browsing, PhishTank, ML model)
+- technicalDetails (domain age, SSL status, WHOIS data, redirects)
+- explainability (ML feature importance)
+- processingTime
+
+Other Endpoints:
+- POST /api/v1/threats/analyze-file (for file analysis)
+- GET /api/v1/threats/history?limit=50&skip=0&riskCategory=HIGH
+- GET /api/v1/threats/statistics
+- GET /health
+
+📱 REQUIRED PAGES:
+
+1. HOME/LANDING PAGE:
+   - Hero section with catchy headline
+   - Large URL input field with "Analyze" button
+   - Quick stats display
+   - Features section (multi-source intel, AI-powered, real-time)
+   - "How it works" section
+
+2. URL SCANNER PAGE (Main Feature):
+   - URL input with validation
+   - Loading state with animated progress
+   - Results display with:
+     * Large circular threat score gauge (0-100, color-coded)
+     * Risk category badge (LOW=green, MEDIUM=yellow, HIGH=orange, CRITICAL=red)
+     * AI analysis text
+     * Expandable risk factors list
+     * Expandable security features list
+     * Detection methods with status icons (✅ PASS, ❌ FAIL, ⚠️ WARNING)
+     * Collapsible technical details
+     * Optional: ML feature importance chart
+   - "Scan Another URL" button
+
+3. FILE SCANNER PAGE:
+   - Drag & drop file upload area
+   - Support HTML, TXT, EML files (max 10MB)
+   - Similar results display as URL scanner
+
+4. SCAN HISTORY PAGE:
+   - Table/cards showing past scans
+   - Filters by risk category
+   - Search by URL
+   - Pagination (50 per page)
+   - Click to view full details
+
+5. STATISTICS DASHBOARD:
+   - Total scans counter (animated)
+   - Recent scans (24h)
+   - Average threat score
+   - Threat distribution pie/donut chart
+   - Timeline chart
+
+6. ABOUT PAGE:
+   - Explain the technology
+   - How detection works
+   - Privacy policy
+
+🎨 DESIGN REQUIREMENTS:
+
+Brand:
+- Name: "Catchers AI"
+- Tagline: "Advanced Threat Detection & Phishing Analysis"
+- Modern, professional, tech-focused design
+- Color scheme: Blue/purple gradient primary, green (safe), yellow (warning), red (danger)
+
+Visual Style:
+- Modern card-based or glassmorphism design
+- Smooth animations and transitions
+- Responsive (mobile, tablet, desktop)
+- Dark mode support (optional but nice)
+
+Key UI Elements:
+- Threat score as large circular gauge with color coding
+- Risk category badges with icons
+- Detection method status with clear icons
+- Expandable/collapsible sections
+- Loading skeletons
+- Toast notifications
+
+🛠️ TECH STACK (Recommended):
+- React 18+ with TypeScript (or Next.js)
+- Tailwind CSS + shadcn/ui components
+- React Query for API calls
+- Recharts for visualizations
+- React Hook Form + Zod validation
+- Framer Motion for animations
+- Lucide React for icons
+
+📊 THREAT SCORE VISUALIZATION:
+- 0-24 (LOW): Green circular gauge
+- 25-49 (MEDIUM): Yellow gauge
+- 50-79 (HIGH): Orange gauge
+- 80-100 (CRITICAL): Red gauge with warning icon
+
+🎯 KEY FEATURES:
+
+Must Have:
+✅ URL analysis with full results display
+✅ Threat score gauge visualization
+✅ Color-coded risk categories
+✅ Detection methods list
+✅ Risk factors display
+✅ Scan history with filtering
+✅ Statistics dashboard
+✅ Responsive design
+✅ Loading states and error handling
+✅ Professional, modern UI
+
+Nice to Have:
+🎯 File upload analysis
+🎯 Dark mode
+🎯 Export reports as PDF
+🎯 Share scan results
+🎯 ML explainability chart
+
+💡 UX PRIORITIES:
+1. Make threat scores IMMEDIATELY clear (big, bold, color-coded)
+2. Use simple language for non-technical users
+3. Show loading progress during analysis (5-10 seconds typical)
+4. Progressive disclosure: summary first, details on demand
+5. Clear call-to-actions
+6. Smooth, professional animations
+
+🔒 IMPORTANT NOTES:
+- Backend is fully functional and tested
+- API returns detailed JSON responses
+- Processing time is 1-6 seconds per scan
+- Handle CORS (backend configured for localhost:8080)
+- Sanitize all user inputs
+- Show clear error messages
+- Implement client-side rate limiting
+
+📦 EXAMPLE API RESPONSE:
+{
+  "success": true,
+  "data": {
+    "url": "http://phishing-site.tk/login",
+    "threatScore": 55,
+    "riskCategory": "HIGH",
+    "recommendation": "Avoid this link - Multiple risk factors detected",
+    "aiAnalysis": "Our ML model detected this as a threat with 73% confidence...",
+    "riskFactors": [
+      "Uses insecure HTTP protocol",
+      "Suspicious TLD (.tk)",
+      "Contains phishing keywords"
+    ],
+    "securityFeatures": [],
+    "detectionMethods": [
+      { "name": "VirusTotal", "result": "PASS", "details": "0 malicious" },
+      { "name": "Google Safe Browsing", "result": "PASS" },
+      { "name": "ML Analysis", "result": "FAIL", "details": "73% threat confidence" }
+    ],
+    "processingTime": "5.9s"
+  }
+}
+
+🎨 COLOR PALETTE:
+- Risk Low: #10B981 (green)
+- Risk Medium: #F59E0B (orange)
+- Risk High: #F97316 (dark orange)
+- Risk Critical: #DC2626 (red)
+- Primary: #3B82F6 (blue)
+- Secondary: #8B5CF6 (purple)
+
+🚀 DELIVERABLES:
+1. Clean, well-organized React/Next.js project
+2. TypeScript for type safety
+3. Responsive design (mobile-first)
+4. README with setup instructions
+5. Environment variables documentation
+6. Production-ready build
+
+📱 RESPONSIVE DESIGN:
+- Mobile: Stack vertically, simplified charts
+- Tablet: 2-column layouts
+- Desktop: Full multi-column layouts
+- Touch-friendly buttons (min 44x44px)
+
+✅ SUCCESS CRITERIA:
+The frontend should seamlessly integrate with the backend API, provide an intuitive user experience, display threat analysis results clearly, be responsive across all devices, handle errors gracefully, and match the professional quality of the backend.
+
+Focus on creating a clean, professional interface that makes complex security data easy to understand for non-technical users while providing detailed information for power users.
+
+Build this as a modern, production-ready web application that I can deploy to Vercel/Netlify and connect to my existing backend API.
