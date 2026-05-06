@@ -61,7 +61,7 @@ const Index = () => {
             className="max-w-3xl mx-auto text-center space-y-6"
           >
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass text-xs font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <Brain className="w-3.5 h-3.5 text-primary" />
               ML-powered phishing detection · 96% accuracy
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
