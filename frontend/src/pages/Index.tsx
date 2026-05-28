@@ -65,8 +65,8 @@ const Index = () => {
               ML-powered phishing detection · 96% accuracy
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
-              Catch threats <br />
-              <span className="text-gradient">before they catch you.</span>
+              Identifying and Neutralizing <br />
+              <span className="text-gradient">Cyber Threats Before User Exposure</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Catchers AI scans any URL or file across multiple threat intelligence feeds and a custom ML model — delivering a clear verdict in seconds.
