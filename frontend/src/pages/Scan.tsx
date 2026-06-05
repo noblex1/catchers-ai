@@ -86,7 +86,7 @@ const Scan = () => {
               <div>
                 <h3 className="font-semibold">Unable to scan this URL</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Check that the backend is running at the configured API URL, then try again.
+                  The scan engine could not be reached after several attempts. Wait a moment and try again.
                 </p>
               </div>
             </div>

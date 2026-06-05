@@ -25,7 +25,9 @@ export const ScanLoading = () => (
       </div>
       <div>
         <h3 className="text-2xl font-bold">Analyzing threats…</h3>
-        <p className="text-muted-foreground mt-1">This usually takes 1–6 seconds</p>
+        <p className="text-muted-foreground mt-1">
+          First scan after a break may take up to a minute while the engine starts.
+        </p>
       </div>
       <div className="w-full max-w-sm space-y-2">
         {stages.map((s, i) => (

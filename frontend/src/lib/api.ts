@@ -1,12 +1,46 @@
 import axios from "axios";
+import { ensureBackendWarm } from "@/lib/backendWarmup";
 
 export const API_BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost:3000";
 
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
-  timeout: 30000,
+  // Cold-hosted backends (e.g. Render) may need extra time on first request.
+  timeout: 90_000,
 });
+
+const RETRYABLE_STATUS = new Set([408, 429, 502, 503, 504]);
+const SCAN_MAX_ATTEMPTS = 4;
+const SCAN_RETRY_DELAYS_MS = [0, 2500, 6000, 12000];
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function isRetryableScanError(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) return false;
+  if (!error.response) return true;
+  return RETRYABLE_STATUS.has(error.response.status);
+}
+
+async function withScanRetry<T>(fn: () => Promise<T>): Promise<T> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < SCAN_MAX_ATTEMPTS; attempt++) {
+    if (attempt > 0) {
+      await sleep(SCAN_RETRY_DELAYS_MS[attempt] ?? 12000);
+    }
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      const canRetry =
+        attempt < SCAN_MAX_ATTEMPTS - 1 && isRetryableScanError(error);
+      if (!canRetry) throw error;
+    }
+  }
+
+  throw lastError;
+}
 
 export type RiskCategory = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
@@ -49,26 +83,31 @@ export interface ApiEnvelope<T> {
 }
 
 export async function analyzeUrl(url: string) {
-  const { data } = await api.post<ApiEnvelope<ThreatAnalysis>>(
-    "/threats/analyze-url",
-    { url }
-  );
-  return data.data;
+  await ensureBackendWarm();
+  return withScanRetry(async () => {
+    const { data } = await api.post<ApiEnvelope<ThreatAnalysis>>(
+      "/threats/analyze-url",
+      { url }
+    );
+    return data.data;
+  });
 }
 
 export async function analyzeFile(file: File) {
-  // Read file content as text
   const fileContent = await file.text();
-  
-  const { data } = await api.post<ApiEnvelope<ThreatAnalysis>>(
-    "/threats/analyze-file",
-    {
-      fileName: file.name,
-      fileContent: fileContent,
-      fileType: file.type || 'text/plain'
-    }
-  );
-  return data.data;
+
+  await ensureBackendWarm();
+  return withScanRetry(async () => {
+    const { data } = await api.post<ApiEnvelope<ThreatAnalysis>>(
+      "/threats/analyze-file",
+      {
+        fileName: file.name,
+        fileContent: fileContent,
+        fileType: file.type || "text/plain",
+      }
+    );
+    return data.data;
+  });
 }
 
 export interface HistoryItem extends ThreatAnalysis {

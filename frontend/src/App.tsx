@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { useBackendWarmup } from "@/hooks/useBackendWarmup";
 import Index from "./pages/Index.tsx";
 import Scan from "./pages/Scan.tsx";
 import FileScan from "./pages/FileScan.tsx";
@@ -16,7 +17,10 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
 
-const App = () => (
+const App = () => {
+  useBackendWarmup();
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -35,6 +39,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
