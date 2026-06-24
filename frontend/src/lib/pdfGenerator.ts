@@ -181,6 +181,58 @@ export const generateScanPDF = (result: ThreatAnalysis): void => {
     addLine();
   }
 
+  // ML Model Performance Metrics
+  if (result.mlMetrics) {
+    addSection("ML MODEL PERFORMANCE");
+    
+    const metrics = [
+      { label: "Accuracy", value: result.mlMetrics.accuracy },
+      { label: "Precision", value: result.mlMetrics.precision },
+      { label: "Recall", value: result.mlMetrics.recall },
+      { label: "F1 Score", value: result.mlMetrics.f1_score },
+    ];
+    
+    // Create a grid-like layout
+    const startX = margin;
+    const startY = yPos;
+    const boxWidth = (contentWidth - 10) / 2;
+    const boxHeight = 25;
+    
+    metrics.forEach((metric, index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const x = startX + col * (boxWidth + 10);
+      const y = startY + row * (boxHeight + 5);
+      
+      // Draw box
+      doc.setFillColor(245, 245, 250);
+      doc.roundedRect(x, y, boxWidth, boxHeight, 2, 2, "F");
+      
+      // Label
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "normal");
+      doc.text(metric.label.toUpperCase(), x + 5, y + 8);
+      
+      // Value
+      doc.setFontSize(18);
+      doc.setTextColor(59, 130, 246);
+      doc.setFont("helvetica", "bold");
+      const percentage = `${(metric.value * 100).toFixed(1)}%`;
+      doc.text(percentage, x + 5, y + 20);
+    });
+    
+    yPos += Math.ceil(metrics.length / 2) * (boxHeight + 5) + 5;
+    
+    // Explanation
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    const explanation = "These metrics represent the ML model's performance on the test dataset. Accuracy shows overall correctness, Precision measures how many predicted threats are actual threats, Recall measures how many actual threats are detected, and F1 Score is the harmonic mean of precision and recall.";
+    addText(explanation, 9, false, [100, 100, 100]);
+    addLine();
+  }
+
   // Technical Details
   if (result.technicalDetails && Object.keys(result.technicalDetails).length > 0) {
     addSection("TECHNICAL DETAILS");

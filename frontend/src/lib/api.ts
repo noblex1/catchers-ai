@@ -50,6 +50,13 @@ export interface DetectionMethod {
   details?: string;
 }
 
+export interface MLMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+}
+
 export interface ThreatAnalysis {
   url?: string;
   fileName?: string;
@@ -68,6 +75,7 @@ export interface ThreatAnalysis {
     suspiciousFeatures: string[];
     featureContributions?: Array<{ feature: string; importance: number }> | null;
   };
+  mlMetrics?: MLMetrics;
   processingTime?: string;
   scanDate?: string;
   scannedAt?: string;

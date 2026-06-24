@@ -274,6 +274,17 @@ export class ThreatAnalysisService {
         mlResult
       );
 
+      // Fetch ML model performance metrics
+      let mlMetrics: any = null;
+      try {
+        const modelInfo = await mlService.getModelInfo();
+        if (modelInfo && modelInfo.accuracy_metrics) {
+          mlMetrics = modelInfo.accuracy_metrics;
+        }
+      } catch (err) {
+        console.warn('Could not fetch ML metrics:', err);
+      }
+
       // Build explainability payload deterministically from features and ML output
       const explainability = {
         numericRiskScore: Math.min(threatScore, 100),
@@ -297,6 +308,7 @@ export class ThreatAnalysisService {
         detectionMethods,
         technicalDetails,
         explainability,
+        mlMetrics,
         whois: safeWhoisInfo,
         redirect: safeRedirectInfo,
         virusTotalScanId: vtResult.scanId,
@@ -436,6 +448,17 @@ export class ThreatAnalysisService {
 
     const processingTime = `${((Date.now() - startTime) / 1000).toFixed(1)}s`;
 
+    // Fetch ML model performance metrics
+    let mlMetrics: any = null;
+    try {
+      const modelInfo = await mlService.getModelInfo();
+      if (modelInfo && modelInfo.accuracy_metrics) {
+        mlMetrics = modelInfo.accuracy_metrics;
+      }
+    } catch (err) {
+      console.warn('Could not fetch ML metrics:', err);
+    }
+
     return {
       fileName,
       fileType,
@@ -448,6 +471,7 @@ export class ThreatAnalysisService {
       riskFactors,
       securityFeatures,
       detectionMethods,
+      mlMetrics,
       technicalDetails: {
         suspiciousScripts: /<script/i.test(fileContent) ? 'Found' : 'None',
         hiddenIframes: /<iframe/i.test(fileContent) ? 'Found' : 'None',

@@ -23,6 +23,13 @@ export interface TechnicalDetails {
   redirect?: any;
 }
 
+export interface MLMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+}
+
 export interface ThreatAnalysisResult {
   url?: string;
   fileName?: string;
@@ -45,6 +52,7 @@ export interface ThreatAnalysisResult {
     suspiciousFeatures: string[];
     featureContributions?: Array<{ feature: string; importance: number }> | null;
   };
+  mlMetrics?: MLMetrics | null;
   whois?: any;
   redirect?: any;
 }

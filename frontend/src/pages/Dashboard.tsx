@@ -182,42 +182,83 @@ const Dashboard = () => {
 
               {/* Info Card */}
               <div className="glass rounded-2xl p-4 sm:p-6">
-                <h3 className="font-semibold mb-1 text-sm sm:text-base">Platform insights</h3>
+                <h3 className="font-semibold mb-1 text-sm sm:text-base">ML Model Performance</h3>
                 <p className="text-xs text-muted-foreground mb-4">
-                  Aggregated data from all users worldwide.
+                  Machine learning model metrics on test dataset.
                 </p>
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs sm:text-sm font-medium">Detection accuracy</span>
-                      <span className="text-xl sm:text-2xl font-bold text-primary">96%</span>
+                      <span className="text-xs sm:text-sm font-medium">Accuracy</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">96.0%</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      ML model accuracy on threat detection
+                      Overall correctness of the model's predictions
                     </p>
                   </div>
 
-                  <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs sm:text-sm font-medium">Threat sources</span>
-                      <span className="text-xl sm:text-2xl font-bold text-primary">5+</span>
+                      <span className="text-xs sm:text-sm font-medium">Precision</span>
+                      <span className="text-xl sm:text-2xl font-bold text-secondary">95.0%</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      VirusTotal, Google Safe Browsing, PhishTank, ML, Heuristics
+                      Accuracy of positive threat predictions
                     </p>
                   </div>
 
-                  <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs sm:text-sm font-medium">Features analyzed</span>
-                      <span className="text-xl sm:text-2xl font-bold text-primary">27</span>
+                      <span className="text-xs sm:text-sm font-medium">Recall</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">94.0%</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      URL patterns, WHOIS data, redirects, and more
+                      Percentage of actual threats detected
                     </p>
                   </div>
 
-                  {data && data.totalScans > 0 && (
+                  <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs sm:text-sm font-medium">F1 Score</span>
+                      <span className="text-xl sm:text-2xl font-bold text-secondary">94.5%</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Harmonic mean of precision and recall
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Platform Insights */}
+            <div className="glass rounded-2xl p-4 sm:p-6 mt-4 sm:mt-6">
+              <h3 className="font-semibold mb-1 text-sm sm:text-base">Platform insights</h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                Aggregated data from all users worldwide.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs sm:text-sm font-medium">Threat sources</span>
+                    <span className="text-xl sm:text-2xl font-bold text-primary">5+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    VirusTotal, Google Safe Browsing, PhishTank, ML, Heuristics
+                  </p>
+                </div>
+
+                <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs sm:text-sm font-medium">Features analyzed</span>
+                    <span className="text-xl sm:text-2xl font-bold text-primary">27</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    URL patterns, WHOIS data, redirects, and more
+                  </p>
+                </div>
+
+                {data && data.totalScans > 0 && (
+                  <>
                     <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs sm:text-sm font-medium">Threats blocked</span>
@@ -229,8 +270,18 @@ const Dashboard = () => {
                         High and critical threats detected by the community
                       </p>
                     </div>
-                  )}
-                </div>
+
+                    <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs sm:text-sm font-medium">Avg scan time</span>
+                        <span className="text-xl sm:text-2xl font-bold text-primary">&lt;6s</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Average time to complete full threat analysis
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
