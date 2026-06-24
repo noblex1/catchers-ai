@@ -32,6 +32,16 @@ app/models/*.pt
 # Keep model directory but ignore models
 !app/models/.gitkeep
 
+# Datasets (CSV files)
+app/data/*.csv
+app/data/*.arff
+app/data/*.zip
+app/data/*.json
+
+# Keep data directory and README
+!app/data/
+!app/data/README.md
+
 # Environment
 .env
 .env.local

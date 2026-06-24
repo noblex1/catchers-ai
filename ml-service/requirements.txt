@@ -10,3 +10,7 @@ python-multipart>=0.0.6
 aiofiles>=23.2.1
 tldextract>=5.1.1
 validators>=0.22.0
+
+# For dataset downloading and processing
+requests>=2.31.0
+scipy>=1.11.0  # For ARFF file loading

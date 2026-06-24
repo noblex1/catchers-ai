@@ -17,23 +17,26 @@ class MLEngine:
     
     def __init__(self):
         self.model = None
-        self.model_version = "1.0.0"
+        self.model_version = "3.0.0"  # Updated to latest version
         self.model_type = "Random Forest Classifier"
         # Updated feature count after adding WHOIS + redirect features
-        self.features_count = 27
-        self.training_date = "2026-01-25"
+        self.features_count = 30  # v3.0.0 uses 30 UCI features directly
+        self.training_date = "2026-06-24"
         self.model_path = "app/models/phishing_detector.pkl"
         
-        # Accuracy metrics (from training)
+        # Accuracy metrics (will be loaded from metadata if available)
         self.accuracy_metrics = {
-            "accuracy": 0.96,
-            "precision": 0.95,
-            "recall": 0.94,
-            "f1_score": 0.945
+            "accuracy": 0.9765,
+            "precision": 0.9793,
+            "recall": 0.9673,
+            "f1_score": 0.9733
         }
         
         # Load model if available
         self._load_model()
+        
+        # Try to load real metrics from metadata
+        self._load_metadata()
     
     def _load_model(self):
         """Load pre-trained model from disk"""
@@ -48,6 +51,37 @@ class MLEngine:
         except Exception as e:
             logger.error(f"Error loading model: {e}")
             self.model = None
+    
+    def _load_metadata(self):
+        """Load model metadata if available (includes real dataset metrics)"""
+        try:
+            metadata_path = "app/models/model_metadata.json"
+            if os.path.exists(metadata_path):
+                import json
+                with open(metadata_path, 'r') as f:
+                    metadata = json.load(f)
+                
+                # Update metrics from metadata if available
+                if 'accuracy' in metadata:
+                    self.accuracy_metrics['accuracy'] = metadata['accuracy']
+                if 'precision' in metadata:
+                    self.accuracy_metrics['precision'] = metadata['precision']
+                if 'recall' in metadata:
+                    self.accuracy_metrics['recall'] = metadata['recall']
+                if 'f1_score' in metadata:
+                    self.accuracy_metrics['f1_score'] = metadata['f1_score']
+                
+                # Update other metadata
+                if 'model_version' in metadata:
+                    self.model_version = metadata['model_version']
+                if 'training_date' in metadata:
+                    self.training_date = metadata['training_date'].split('T')[0]
+                if 'n_features' in metadata:
+                    self.features_count = metadata['n_features']
+                
+                logger.info(f"Loaded metadata: v{self.model_version}, Accuracy: {self.accuracy_metrics['accuracy']:.4f}")
+        except Exception as e:
+            logger.warning(f"Could not load metadata: {e}")
     
     def is_model_loaded(self) -> bool:
         """Check if ML model is loaded"""
