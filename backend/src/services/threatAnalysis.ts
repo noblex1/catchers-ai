@@ -523,7 +523,7 @@ export class ThreatAnalysisService {
   }
 
   private generateAIAnalysis(
-    url: string,
+    _url: string,
     _score: number,
     risks: string[],
     category: string,
