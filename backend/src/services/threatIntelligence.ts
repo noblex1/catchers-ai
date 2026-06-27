@@ -58,12 +58,37 @@ class ThreatIntelligenceService {
       const urlId = submitResponse.data.data.id;
       const scanId = urlId;
 
-      // Wait a bit for analysis to complete (in production, use polling)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Get analysis results
-      const analysisResponse = await this.virusTotalClient.get(`/urls/${urlId}`);
-      const data: VirusTotalResponse = analysisResponse.data;
+      // Poll for analysis completion with retries
+      let data: VirusTotalResponse | null = null;
+      const maxRetries = 3;
+      const retryDelay = 3000; // 3 seconds between retries
+      
+      for (let i = 0; i < maxRetries; i++) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        
+        try {
+          const analysisResponse = await this.virusTotalClient.get(`/urls/${urlId}`);
+          data = analysisResponse.data;
+          
+          // Check if analysis is complete
+          if (data) {
+            const stats = data.data.attributes.last_analysis_stats;
+            const totalEngines = stats.harmless + stats.malicious + stats.suspicious + stats.undetected;
+            
+            // If we have results from at least 10 engines, consider it complete
+            if (totalEngines >= 10) {
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`VirusTotal retry ${i + 1}/${maxRetries} failed`);
+          if (i === maxRetries - 1) throw err;
+        }
+      }
+      
+      if (!data) {
+        throw new Error('Failed to get VirusTotal analysis results');
+      }
 
       const stats = data.data.attributes.last_analysis_stats;
       const malicious = stats.malicious || 0;

@@ -1,0 +1,24 @@
+services:
+  # ML Service for Threat Detection
+  - type: web
+    name: catchers-ai-ml-service
+    env: python
+    region: oregon # Change to your preferred region
+    plan: starter # Free tier, upgrade to standard if needed
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ML_SERVICE_PORT
+        fromEnv: PORT # Render automatically provides PORT
+      - key: ML_SERVICE_HOST
+        value: 0.0.0.0
+      - key: MODEL_PATH
+        value: app/models/phishing_detector.pkl
+      - key: MODEL_VERSION
+        value: 1.0.0
+      - key: LOG_LEVEL
+        value: INFO
+    healthCheckPath: /health
+    autoDeploy: true

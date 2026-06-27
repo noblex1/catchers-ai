@@ -13,6 +13,10 @@ export class ThreatAnalysisService {
   ];
 
   private suspiciousTlds = /\.tk|\.ml|\.ga|\.cf|\.top|\.xyz|\.info|\.biz$/i;
+  
+  // Cache for scan results to ensure consistency
+  private scanCache: Map<string, { result: ThreatAnalysisResult; timestamp: number }> = new Map();
+  private cacheExpiryMs = 5 * 60 * 1000; // 5 minutes
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallbackValue: T): Promise<T> {
     try {
@@ -40,6 +44,20 @@ export class ThreatAnalysisService {
     const startTime = Date.now();
 
     try {
+      // Normalize URL for cache lookup
+      const normalizedUrl = url.trim().toLowerCase();
+      
+      // Check cache first for consistent results
+      const cached = this.scanCache.get(normalizedUrl);
+      if (cached && (Date.now() - cached.timestamp) < this.cacheExpiryMs) {
+        console.log(`Returning cached result for ${url}`);
+        return {
+          ...cached.result,
+          scanDate: new Date().toISOString(),
+          processingTime: '0.1s (cached)',
+        };
+      }
+
       // Validate URL
       const urlObj = new URL(url);
       const domain = urlObj.hostname;
@@ -71,12 +89,15 @@ export class ThreatAnalysisService {
 
       // 1. VirusTotal Check
       if (vtResult.isThreat) {
-        threatScore += Math.min(70, vtResult.malicious * 10 + vtResult.suspicious * 5);
+        const vtScore = Math.min(70, vtResult.malicious * 10 + vtResult.suspicious * 5);
+        threatScore += vtScore;
+        console.log(`[Threat Analysis] VirusTotal added ${vtScore} points (malicious: ${vtResult.malicious}, suspicious: ${vtResult.suspicious})`);
         riskFactors.push(
-          `VirusTotal: ${vtResult.malicious} security engines flagged this as malicious, ${vtResult.suspicious} as suspicious`
+          `🛡️ Security Alert: ${vtResult.malicious} trusted security companies flagged this website as dangerous, and ${vtResult.suspicious} found it suspicious. This is similar to multiple police departments warning about the same location.`
         );
       } else if (vtResult.harmless > 0) {
-        securityFeatures.push(`VirusTotal: ${vtResult.harmless} security engines marked this as harmless`);
+        console.log(`[Threat Analysis] VirusTotal: ${vtResult.harmless} engines marked as harmless`);
+        securityFeatures.push(`✓ Verified by ${vtResult.harmless} security companies as safe`);
       }
       detectionMethods.push({
         name: 'VirusTotal Analysis',
@@ -88,9 +109,11 @@ export class ThreatAnalysisService {
       // 2. Google Safe Browsing Check
       if (gsbResult.isThreat) {
         threatScore += 60;
-        riskFactors.push(`Google Safe Browsing: Detected as ${gsbResult.threatTypes.join(', ')}`);
+        console.log(`[Threat Analysis] Google Safe Browsing added 60 points (threats: ${gsbResult.threatTypes.join(', ')})`);
+        riskFactors.push(`🚨 Google Warning: This website is flagged by Google's security system for ${this.translateThreatTypes(gsbResult.threatTypes)}. Google protects over 4 billion devices worldwide - when they warn you, take it seriously.`);
       } else {
-        securityFeatures.push('Google Safe Browsing: No threats detected');
+        console.log(`[Threat Analysis] Google Safe Browsing: No threats detected`);
+        securityFeatures.push('✓ No threats found in Google\'s global security database');
       }
       detectionMethods.push({
         name: 'Google Safe Browsing',
@@ -102,8 +125,8 @@ export class ThreatAnalysisService {
       // 3. PhishTank Check
       if (ptResult.isPhishing) {
         threatScore += 50;
-        const verification = ptResult.verified ? ' (verified)' : ' (unverified)';
-        riskFactors.push(`PhishTank: Identified as phishing site${verification}`);
+        const verification = ptResult.verified ? ' (verified by security experts)' : ' (reported by users)';
+        riskFactors.push(`🎣 Phishing Alert: This website is in the PhishTank database - a global directory of confirmed scam websites that try to steal your passwords, credit cards, or personal information${verification}. Like a "Most Wanted" list for fake websites.`);
       }
       detectionMethods.push({
         name: 'PhishTank Database',
@@ -166,7 +189,9 @@ export class ThreatAnalysisService {
         
         // Weight ML prediction based on confidence
         if (mlResult.prediction.is_threat) {
-          threatScore += Math.round(mlScore * mlConfidence);
+          const mlContribution = Math.round(mlScore * mlConfidence);
+          threatScore += mlContribution;
+          console.log(`[Threat Analysis] ML Model added ${mlContribution} points (ML score: ${mlScore}, confidence: ${(mlConfidence * 100).toFixed(1)}%)`);
           riskFactors.push(
             `AI/ML Model: Detected as threat with ${(mlConfidence * 100).toFixed(1)}% confidence (ML Score: ${mlScore}/100)`
           );
@@ -177,6 +202,7 @@ export class ThreatAnalysisService {
             }
           });
         } else {
+          console.log(`[Threat Analysis] ML Model: Classified as safe with ${(mlConfidence * 100).toFixed(1)}% confidence`);
           securityFeatures.push(
             `AI/ML Model: Classified as safe with ${(mlConfidence * 100).toFixed(1)}% confidence`
           );
@@ -189,6 +215,7 @@ export class ThreatAnalysisService {
           details: `Confidence: ${(mlConfidence * 100).toFixed(1)}%, Features: ${mlResult.prediction.features_analyzed}`,
         });
       } else {
+        console.log(`[Threat Analysis] ML Model: Service unavailable`);
         detectionMethods.push({
           name: 'Machine Learning Analysis',
           result: 'WARNING',
@@ -196,24 +223,28 @@ export class ThreatAnalysisService {
         });
       }
 
+      console.log(`[Threat Analysis] Total threat score: ${Math.min(threatScore, 100)} (before cap)`);
+
+
       // 5. HTTPS Check
       const hasHttps = url.toLowerCase().startsWith('https://');
       if (!hasHttps) {
         threatScore += 25;
-        riskFactors.push('Uses insecure HTTP protocol (no SSL/TLS encryption)');
+        riskFactors.push(this.getHttpSecurityExplanation(url));
       } else {
-        securityFeatures.push('Uses secure HTTPS protocol with SSL/TLS encryption');
+        securityFeatures.push('✓ Uses secure HTTPS connection (look for the padlock 🔒 in your browser)');
       }
       detectionMethods.push({
-        name: 'SSL/TLS Check',
+        name: 'Connection Security Check',
         result: hasHttps ? 'PASS' : 'FAIL',
+        details: hasHttps ? 'Secure HTTPS connection' : 'Insecure HTTP connection - data not encrypted',
       });
 
       // 6. Heuristic Analysis
       const hasSuspiciousPattern = this.suspiciousPatterns.some(pattern => pattern.test(url));
       if (hasSuspiciousPattern) {
         threatScore += 20;
-        riskFactors.push('Contains suspicious keywords or patterns commonly used in phishing');
+        riskFactors.push('⚠️ Suspicious Language Detected: This link uses urgent or alarming words that scammers commonly use to pressure you into acting quickly (like "urgent", "verify now", "suspended account"). Legitimate companies rarely use such aggressive language.');
       }
       detectionMethods.push({
         name: 'Heuristic Analysis',
@@ -223,13 +254,13 @@ export class ThreatAnalysisService {
       // 7. URL Shortener Check
       if (/bit\.ly|tinyurl|t\.co|short\.link|goo\.gl/i.test(url)) {
         threatScore += 15;
-        riskFactors.push('Uses URL shortening service (hides true destination)');
+        riskFactors.push('🔗 Shortened Link Warning: This is a shortened link (like bit.ly or tinyurl) that hides the real destination. It\'s like getting directions to a house but not knowing the actual address until you arrive. Scammers use these to disguise malicious websites.');
       }
 
       // 8. Suspicious TLD Check
       if (this.suspiciousTlds.test(domain)) {
         threatScore += 10;
-        riskFactors.push('Uses potentially suspicious top-level domain');
+        riskFactors.push('🌐 Unusual Domain Extension: This website uses a domain ending (like .tk, .ml, .ga) that\'s often associated with scam websites because they\'re cheap or free to register. While not always dangerous, proceed with extra caution.');
       }
 
       // 9. Domain Info (placeholder - would use real WHOIS API)
@@ -295,7 +326,7 @@ export class ThreatAnalysisService {
 
       const processingTime = `${((Date.now() - startTime) / 1000).toFixed(1)}s`;
 
-      return {
+      const result: ThreatAnalysisResult = {
         url,
         threatScore: Math.min(threatScore, 100),
         riskCategory,
@@ -313,6 +344,17 @@ export class ThreatAnalysisService {
         redirect: safeRedirectInfo,
         virusTotalScanId: vtResult.scanId,
       };
+
+      // Cache the result
+      this.scanCache.set(normalizedUrl, {
+        result,
+        timestamp: Date.now(),
+      });
+
+      // Clean up old cache entries
+      this.cleanCache();
+
+      return result;
     } catch (error: any) {
       console.error('Threat analysis error:', error);
       
@@ -530,6 +572,54 @@ export class ThreatAnalysisService {
     }
 
     return `The file "${fileName}" appears to be clean with no obvious malicious indicators. The content follows standard formatting practices and contains no suspicious elements that would indicate malicious intent.`;
+  }
+
+  /**
+   * Clean up expired cache entries
+   */
+  private cleanCache(): void {
+    const now = Date.now();
+    for (const [key, value] of this.scanCache.entries()) {
+      if (now - value.timestamp > this.cacheExpiryMs) {
+        this.scanCache.delete(key);
+      }
+    }
+  }
+
+  /**
+   * Translate technical threat types into user-friendly language
+   */
+  private translateThreatTypes(threatTypes: string[]): string {
+    const translations: Record<string, string> = {
+      'MALWARE': 'containing viruses or harmful software',
+      'SOCIAL_ENGINEERING': 'trying to trick you into giving away passwords or personal info',
+      'UNWANTED_SOFTWARE': 'installing unwanted programs on your device',
+      'POTENTIALLY_HARMFUL_APPLICATION': 'potentially harmful apps or downloads',
+    };
+
+    const friendly = threatTypes
+      .map(type => translations[type] || type.toLowerCase().replace(/_/g, ' '))
+      .join(', ');
+
+    return friendly || 'suspicious activity';
+  }
+
+  /**
+   * Generate user-friendly explanation for HTTP security
+   */
+  private getHttpSecurityExplanation(url: string): string {
+    // Extract just the protocol part for display
+    const protocol = url.split('://')[0].toLowerCase();
+    
+    if (protocol === 'http') {
+      return '⚠️ No Secure Connection (Missing "S" in HTTPS)\n\n' +
+             'What this means: This website uses HTTP instead of HTTPS - notice there\'s no "S" at the end.\n\n' +
+             '🔓 Think of it like this: HTTP is like sending a postcard - anyone who handles it can read your message. HTTPS is like a sealed, locked envelope - only you and the recipient can see what\'s inside.\n\n' +
+             '🚨 The danger: On this website, anything you type (passwords, credit card numbers, personal information) can be seen by hackers, your internet provider, or anyone snooping on your WiFi.\n\n' +
+             '✅ What to look for: Safe websites show "HTTPS" and a padlock icon 🔒 in your browser\'s address bar. Never enter sensitive information on HTTP sites.';
+    }
+    
+    return 'Uses insecure connection - Your data is not protected';
   }
 }
 
