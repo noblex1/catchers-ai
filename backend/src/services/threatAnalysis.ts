@@ -93,11 +93,11 @@ export class ThreatAnalysisService {
         threatScore += vtScore;
         console.log(`[Threat Analysis] VirusTotal added ${vtScore} points (malicious: ${vtResult.malicious}, suspicious: ${vtResult.suspicious})`);
         riskFactors.push(
-          `🛡️ Security Alert: ${vtResult.malicious} trusted security companies flagged this website as dangerous, and ${vtResult.suspicious} found it suspicious. This is similar to multiple police departments warning about the same location.`
+          `Security Alert: Flagged by ${vtResult.malicious} security vendors as malicious and ${vtResult.suspicious} as suspicious. This website has been identified as dangerous by multiple independent security companies.`
         );
       } else if (vtResult.harmless > 0) {
         console.log(`[Threat Analysis] VirusTotal: ${vtResult.harmless} engines marked as harmless`);
-        securityFeatures.push(`✓ Verified by ${vtResult.harmless} security companies as safe`);
+        securityFeatures.push(`Verified safe by ${vtResult.harmless} security vendors`);
       }
       detectionMethods.push({
         name: 'VirusTotal Analysis',
@@ -110,10 +110,10 @@ export class ThreatAnalysisService {
       if (gsbResult.isThreat) {
         threatScore += 60;
         console.log(`[Threat Analysis] Google Safe Browsing added 60 points (threats: ${gsbResult.threatTypes.join(', ')})`);
-        riskFactors.push(`🚨 Google Warning: This website is flagged by Google's security system for ${this.translateThreatTypes(gsbResult.threatTypes)}. Google protects over 4 billion devices worldwide - when they warn you, take it seriously.`);
+        riskFactors.push(`Google Safe Browsing Warning: Flagged for ${this.translateThreatTypes(gsbResult.threatTypes)}. This website has been identified as dangerous by Google's global security system.`);
       } else {
         console.log(`[Threat Analysis] Google Safe Browsing: No threats detected`);
-        securityFeatures.push('✓ No threats found in Google\'s global security database');
+        securityFeatures.push('No threats found in Google Safe Browsing database');
       }
       detectionMethods.push({
         name: 'Google Safe Browsing',
@@ -125,8 +125,8 @@ export class ThreatAnalysisService {
       // 3. PhishTank Check
       if (ptResult.isPhishing) {
         threatScore += 50;
-        const verification = ptResult.verified ? ' (verified by security experts)' : ' (reported by users)';
-        riskFactors.push(`🎣 Phishing Alert: This website is in the PhishTank database - a global directory of confirmed scam websites that try to steal your passwords, credit cards, or personal information${verification}. Like a "Most Wanted" list for fake websites.`);
+        const verification = ptResult.verified ? ' (verified by security experts)' : ' (reported by community)';
+        riskFactors.push(`Phishing Database Match: Listed in PhishTank as a confirmed phishing website${verification}. This site is designed to steal personal information, passwords, or financial data.`);
       }
       detectionMethods.push({
         name: 'PhishTank Database',
@@ -232,7 +232,7 @@ export class ThreatAnalysisService {
         threatScore += 25;
         riskFactors.push(this.getHttpSecurityExplanation(url));
       } else {
-        securityFeatures.push('✓ Uses secure HTTPS connection (look for the padlock 🔒 in your browser)');
+        securityFeatures.push('Uses secure HTTPS connection with encrypted data transmission');
       }
       detectionMethods.push({
         name: 'Connection Security Check',
@@ -244,7 +244,7 @@ export class ThreatAnalysisService {
       const hasSuspiciousPattern = this.suspiciousPatterns.some(pattern => pattern.test(url));
       if (hasSuspiciousPattern) {
         threatScore += 20;
-        riskFactors.push('⚠️ Suspicious Language Detected: This link uses urgent or alarming words that scammers commonly use to pressure you into acting quickly (like "urgent", "verify now", "suspended account"). Legitimate companies rarely use such aggressive language.');
+        riskFactors.push('Suspicious Language Detected: Contains urgent or alarming words commonly used in phishing attacks (e.g., "urgent", "verify now", "account suspended"). Legitimate companies rarely use such aggressive language.');
       }
       detectionMethods.push({
         name: 'Heuristic Analysis',
@@ -254,13 +254,13 @@ export class ThreatAnalysisService {
       // 7. URL Shortener Check
       if (/bit\.ly|tinyurl|t\.co|short\.link|goo\.gl/i.test(url)) {
         threatScore += 15;
-        riskFactors.push('🔗 Shortened Link Warning: This is a shortened link (like bit.ly or tinyurl) that hides the real destination. It\'s like getting directions to a house but not knowing the actual address until you arrive. Scammers use these to disguise malicious websites.');
+        riskFactors.push('Shortened URL: Uses a URL shortening service that hides the actual destination. Attackers commonly use shortened links to disguise malicious websites.');
       }
 
       // 8. Suspicious TLD Check
       if (this.suspiciousTlds.test(domain)) {
         threatScore += 10;
-        riskFactors.push('🌐 Unusual Domain Extension: This website uses a domain ending (like .tk, .ml, .ga) that\'s often associated with scam websites because they\'re cheap or free to register. While not always dangerous, proceed with extra caution.');
+        riskFactors.push('Suspicious Domain Extension: Uses a domain extension (.tk, .ml, .ga, .cf, .top, .xyz) commonly associated with malicious websites due to low registration costs.');
       }
 
       // 9. Domain Info (placeholder - would use real WHOIS API)
@@ -531,26 +531,38 @@ export class ThreatAnalysisService {
     gsbResult: any,
     mlResult?: any
   ): string {
-    // Include ML insights if available
+    // Build clean ML insights
     const mlInsight = mlResult?.prediction.is_threat 
-      ? `Our machine learning model (trained on thousands of phishing patterns) has identified this URL as a threat with ${(mlResult.prediction.confidence * 100).toFixed(1)}% confidence. `
+      ? `Our machine learning model analyzed ${mlResult.prediction.features_analyzed} URL characteristics and identified this as a potential threat with ${(mlResult.prediction.confidence * 100).toFixed(0)}% confidence. `
       : mlResult 
-      ? `Our AI model has analyzed ${mlResult.prediction.features_analyzed} features and classified this as safe with ${(mlResult.prediction.confidence * 100).toFixed(1)}% confidence. `
+      ? `Our AI model analyzed ${mlResult.prediction.features_analyzed} features and classified this URL as safe with ${(mlResult.prediction.confidence * 100).toFixed(0)}% confidence. `
       : '';
     
     if (category === 'CRITICAL') {
-      return `${mlInsight}WARNING: "${url}" appears to be a highly dangerous website with multiple critical threat indicators. This site has been flagged by ${vtResult.malicious || 0} security engines as malicious and has been identified as ${gsbResult.threatTypes.join(' or ') || 'a threat'}. The combination of these factors strongly suggests this is designed for malicious purposes such as credential theft, malware distribution, or financial fraud.`;
+      const flaggedBy = vtResult.malicious || 0;
+      const threatInfo = gsbResult.threatTypes.length > 0 
+        ? ` Google Safe Browsing has flagged it for ${this.translateThreatTypes(gsbResult.threatTypes)}.`
+        : '';
+      
+      return `${mlInsight}This URL presents a severe security risk. ${flaggedBy > 0 ? `It has been flagged by ${flaggedBy} security vendor${flaggedBy > 1 ? 's' : ''} as malicious.` : ''}${threatInfo} Multiple independent security systems have identified this website as dangerous. Strong indicators suggest this site is designed for malicious purposes such as credential theft, malware distribution, or financial fraud. Do not proceed.`;
     }
 
     if (category === 'HIGH') {
-      return `${mlInsight}I've detected multiple red flags for "${url}" that strongly suggest this is a potentially dangerous site. ${risks.slice(0, 2).join(' and ').toLowerCase()} are common indicators of phishing or malware distribution. I strongly advise against visiting this site.`;
+      const riskSummary = risks.length > 0 
+        ? `Detected risks include: ${risks[0].split(':')[0].toLowerCase()}.`
+        : 'Multiple security concerns detected.';
+      
+      return `${mlInsight}This URL exhibits multiple red flags indicating a potentially dangerous website. ${riskSummary} These patterns are commonly associated with phishing attacks, malware distribution, or other malicious activities. We strongly recommend avoiding this site.`;
     }
 
     if (category === 'MEDIUM') {
-      return `${mlInsight}The URL "${url}" shows some concerning patterns that warrant caution. While not definitively malicious, ${risks[0]?.toLowerCase() || 'certain risk factors'} suggest you should verify the site's legitimacy before providing any sensitive information.`;
+      const primaryRisk = risks[0] ? risks[0].split(':')[0] : 'Certain indicators';
+      
+      return `${mlInsight}This URL shows some concerning characteristics that warrant caution. ${primaryRisk} detected in our analysis. While not definitively malicious, you should verify the website's legitimacy before entering any personal information, passwords, or payment details.`;
     }
 
-    return `${mlInsight}Based on my analysis, "${url}" appears to be a legitimate website with minimal security concerns. The site uses standard security practices and shows no obvious signs of malicious intent. However, remain vigilant and always verify sites before entering personal information.`;
+    // LOW risk
+    return `${mlInsight}Based on comprehensive security analysis, this URL appears to be legitimate with minimal risk indicators. The website uses standard security practices and shows no obvious signs of malicious intent. However, always exercise normal security precautions when providing sensitive information online.`;
   }
 
   private generateFileAIAnalysis(
@@ -612,14 +624,10 @@ export class ThreatAnalysisService {
     const protocol = url.split('://')[0].toLowerCase();
     
     if (protocol === 'http') {
-      return '⚠️ No Secure Connection (Missing "S" in HTTPS)\n\n' +
-             'What this means: This website uses HTTP instead of HTTPS - notice there\'s no "S" at the end.\n\n' +
-             '🔓 Think of it like this: HTTP is like sending a postcard - anyone who handles it can read your message. HTTPS is like a sealed, locked envelope - only you and the recipient can see what\'s inside.\n\n' +
-             '🚨 The danger: On this website, anything you type (passwords, credit card numbers, personal information) can be seen by hackers, your internet provider, or anyone snooping on your WiFi.\n\n' +
-             '✅ What to look for: Safe websites show "HTTPS" and a padlock icon 🔒 in your browser\'s address bar. Never enter sensitive information on HTTP sites.';
+      return 'No Secure Connection: This website uses HTTP instead of HTTPS (no "S" means no security). Your data is not encrypted and can be intercepted by anyone on the network. Never enter passwords, credit cards, or personal information on HTTP sites.';
     }
     
-    return 'Uses insecure connection - Your data is not protected';
+    return 'Insecure connection detected - Data transmitted without encryption';
   }
 }
 

@@ -162,16 +162,18 @@ export const ScanResults = ({ result, onReset }: Props) => {
 
       {/* AI Analysis */}
       {result.aiAnalysis && (
-        <Section title="AI analysis" icon={Sparkles}>
-          <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
-            {result.aiAnalysis}
-          </p>
+        <Section title="AI Analysis" icon={Sparkles}>
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <p className="text-sm sm:text-base leading-relaxed text-foreground/90">
+              {result.aiAnalysis}
+            </p>
+          </div>
         </Section>
       )}
 
       {/* Detection methods */}
       {detectionMethods.length > 0 && (
-        <Section title="Detection methods" icon={ShieldCheck} count={detectionMethods.length}>
+        <Section title="Detection Methods" icon={ShieldCheck} count={detectionMethods.length}>
           <div className="grid gap-3">
             {detectionMethods.map((m, i) => (
               <div
@@ -195,7 +197,7 @@ export const ScanResults = ({ result, onReset }: Props) => {
       <div className="grid gap-6">
         {/* Risk factors */}
         <Section
-          title="Risk factors"
+          title="Risk Factors"
           icon={AlertTriangle}
           count={riskFactors.length}
           defaultOpen={riskFactors.length > 0}
@@ -203,11 +205,11 @@ export const ScanResults = ({ result, onReset }: Props) => {
           {riskFactors.length === 0 ? (
             <p className="text-sm text-muted-foreground">No risk factors detected.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {riskFactors.map((f, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm">
-                  <AlertCircle className="w-4 h-4 text-risk-high mt-0.5 shrink-0" />
-                  <span className="break-words">{f}</span>
+                <li key={i} className="flex items-start gap-3 text-sm sm:text-base leading-relaxed">
+                  <AlertCircle className="w-5 h-5 text-risk-high mt-0.5 shrink-0" />
+                  <span className="break-words text-foreground/90">{f}</span>
                 </li>
               ))}
             </ul>
@@ -216,7 +218,7 @@ export const ScanResults = ({ result, onReset }: Props) => {
 
         {/* Security features */}
         <Section
-          title="Security features"
+          title="Security Features"
           icon={ShieldAlert}
           count={securityFeatures.length}
         >
@@ -225,11 +227,11 @@ export const ScanResults = ({ result, onReset }: Props) => {
               No notable security features detected.
             </p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {securityFeatures.map((f, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-risk-low mt-0.5 shrink-0" />
-                  <span className="break-words">{f}</span>
+                <li key={i} className="flex items-start gap-3 text-sm sm:text-base leading-relaxed">
+                  <CheckCircle2 className="w-5 h-5 text-risk-low mt-0.5 shrink-0" />
+                  <span className="break-words text-foreground/90">{f}</span>
                 </li>
               ))}
             </ul>
@@ -239,7 +241,7 @@ export const ScanResults = ({ result, onReset }: Props) => {
 
       {/* ML Explainability */}
       {explainability.length > 0 && (
-        <Section title="ML feature importance" icon={Sparkles} defaultOpen={false}>
+        <Section title="ML Feature Importance" icon={Activity} defaultOpen={false}>
           <div className="space-y-2.5">
             {explainability.slice(0, 8).map((e, i) => {
               const pct = Math.round(Math.abs(e.importance) * 100);
@@ -304,7 +306,7 @@ export const ScanResults = ({ result, onReset }: Props) => {
 
       {/* Technical details */}
       {Object.keys(technical).length > 0 && (
-        <Section title="Technical details" icon={AlertCircle} defaultOpen={false}>
+        <Section title="Technical Details" icon={AlertCircle} defaultOpen={false}>
           <div className="grid gap-3 text-sm">
             {Object.entries(technical).map(([k, v]) => (
               <div key={k} className="p-3 rounded-lg bg-muted/30 border border-border/50">
