@@ -11,8 +11,6 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
-      - key: ML_SERVICE_PORT
-        fromEnv: PORT # Render automatically provides PORT
       - key: ML_SERVICE_HOST
         value: 0.0.0.0
       - key: MODEL_PATH
