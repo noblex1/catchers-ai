@@ -12,6 +12,9 @@ import { apiRateLimiter } from './middleware/rateLimiter.js';
 
 const app = express();
 
+// Trust proxy - Required for Render/Heroku/AWS
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(

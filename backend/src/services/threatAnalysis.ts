@@ -240,7 +240,23 @@ export class ThreatAnalysisService {
         details: hasHttps ? 'Secure HTTPS connection' : 'Insecure HTTP connection - data not encrypted',
       });
 
-      // 6. Heuristic Analysis
+      // 6. Brand Impersonation Check (HIGH PRIORITY - before ML)
+      const brandPattern = /paypal|amazon|microsoft|google|apple|netflix|spotify|office365|outlook|login.*microsoft/i;
+      const hasBrandInDomain = brandPattern.test(domain);
+      if (hasBrandInDomain && !hasHttps) {
+        threatScore += 40;
+        riskFactors.push('Critical: Brand Impersonation Detected - Domain contains a major brand name (Microsoft, PayPal, etc.) combined with insecure HTTP connection. This is a strong indicator of phishing.');
+      } else if (hasBrandInDomain) {
+        threatScore += 25;
+        riskFactors.push('Suspicious: Domain contains a major brand name but may not be official. Verify the exact domain matches the legitimate company website.');
+      }
+      detectionMethods.push({
+        name: 'Brand Impersonation Check',
+        result: hasBrandInDomain ? 'FAIL' : 'PASS',
+        details: hasBrandInDomain ? 'Domain contains brand keywords' : 'No brand impersonation detected',
+      });
+
+      // 7. Heuristic Analysis
       const hasSuspiciousPattern = this.suspiciousPatterns.some(pattern => pattern.test(url));
       if (hasSuspiciousPattern) {
         threatScore += 20;
