@@ -93,7 +93,11 @@ const Scan = () => {
           )}
 
           {mutation.data && (
-            <ScanResults result={{ ...mutation.data, url: mutation.data.url || submittedUrl }} onReset={reset} />
+            <ScanResults
+              key={mutation.submittedAt}
+              result={{ ...mutation.data, url: mutation.data.url || submittedUrl }}
+              onReset={reset}
+            />
           )}
         </div>
       </section>

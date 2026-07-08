@@ -18,6 +18,7 @@ import {
 import { Activity, ShieldCheck, Gauge, TrendingUp, Loader2, Globe } from "lucide-react";
 import { riskMeta } from "@/lib/risk";
 import type { RiskCategory } from "@/lib/api";
+import { generateMLMetrics } from "@/lib/mlMetrics";
 
 const CountUp = ({ value }: { value: number }) => {
   const [n, setN] = useState(0);
@@ -66,21 +67,6 @@ const StatCard = ({
     </div>
   </motion.div>
 );
-
-// Generate varying ML metrics between 90-100%
-const generateMLMetrics = () => {
-  const accuracy = 0.90 + Math.random() * 0.10;
-  const precision = 0.90 + Math.random() * 0.10;
-  const recall = 0.90 + Math.random() * 0.10;
-  const f1_score = 2 * (precision * recall) / (precision + recall);
-  
-  return {
-    accuracy: parseFloat(accuracy.toFixed(4)),
-    precision: parseFloat(precision.toFixed(4)),
-    recall: parseFloat(recall.toFixed(4)),
-    f1_score: parseFloat(f1_score.toFixed(4))
-  };
-};
 
 const Dashboard = () => {
   const { data, isLoading, isError, dataUpdatedAt } = useQuery({

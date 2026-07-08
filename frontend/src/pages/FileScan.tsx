@@ -144,6 +144,7 @@ const FileScan = () => {
 
           {mutation.data && (
             <ScanResults
+              key={mutation.submittedAt}
               result={{ ...mutation.data, fileName: mutation.data.fileName || file?.name }}
               onReset={reset}
             />
