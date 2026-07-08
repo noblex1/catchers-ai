@@ -152,6 +152,7 @@ export interface Statistics {
   recentScans: number;
   avgThreatScore: number;
   threatDistribution: Record<RiskCategory, number>;
+  mlMetrics?: MLMetrics;
 }
 
 export async function getStatistics() {

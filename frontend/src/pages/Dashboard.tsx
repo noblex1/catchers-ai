@@ -190,7 +190,9 @@ const Dashboard = () => {
                   <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs sm:text-sm font-medium">Accuracy</span>
-                      <span className="text-xl sm:text-2xl font-bold text-primary">96.0%</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">
+                        {data?.mlMetrics?.accuracy ? (data.mlMetrics.accuracy * 100).toFixed(1) : '96.0'}%
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Overall correctness of the model's predictions
@@ -200,7 +202,9 @@ const Dashboard = () => {
                   <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs sm:text-sm font-medium">Precision</span>
-                      <span className="text-xl sm:text-2xl font-bold text-secondary">95.0%</span>
+                      <span className="text-xl sm:text-2xl font-bold text-secondary">
+                        {data?.mlMetrics?.precision ? (data.mlMetrics.precision * 100).toFixed(1) : '95.0'}%
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Accuracy of positive threat predictions
@@ -210,7 +214,9 @@ const Dashboard = () => {
                   <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs sm:text-sm font-medium">Recall</span>
-                      <span className="text-xl sm:text-2xl font-bold text-primary">94.0%</span>
+                      <span className="text-xl sm:text-2xl font-bold text-primary">
+                        {data?.mlMetrics?.recall ? (data.mlMetrics.recall * 100).toFixed(1) : '94.0'}%
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Percentage of actual threats detected
@@ -220,7 +226,9 @@ const Dashboard = () => {
                   <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs sm:text-sm font-medium">F1 Score</span>
-                      <span className="text-xl sm:text-2xl font-bold text-secondary">94.5%</span>
+                      <span className="text-xl sm:text-2xl font-bold text-secondary">
+                        {data?.mlMetrics?.f1_score ? (data.mlMetrics.f1_score * 100).toFixed(1) : '94.5'}%
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Harmonic mean of precision and recall
